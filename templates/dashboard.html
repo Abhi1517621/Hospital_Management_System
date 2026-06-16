@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 50px; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h1 { color: #2c3e50; }
+        .role-badge { background: #3498db; color: white; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+        .logout-btn { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Welcome back!</h1>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Role:</strong> <span class="role-badge">{{ request.user.role }}</span></p>
+        
+        <p style="margin-top: 20px; color: #7f8c8d;">
+            This is the universal dashboard gateway. From here, we will build out the specific interfaces for the different hospital roles.
+        </p>
+
+        <a href="{% url 'logout' %}" class="logout-btn">Log Out</a>
+    </div>
+
+</body>
+</html>

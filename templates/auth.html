@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMS | Secure Gateway</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+</head>
+<body>
+    <div class="auth-container">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="auth-toggle">
+            <button id="show-login" class="active">Log In</button>
+            <button id="show-signup">Sign Up</button>
+        </div>
+
+        <form id="login-form" method="POST" action="{% url 'auth_gateway' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="login">
+            <h2>System Login</h2>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Authenticate</button>
+        </form>
+
+        <form id="signup-form" method="POST" action="{% url 'auth_gateway' %}" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="signup">
+            <h2>Register Profile</h2>
+            
+            <div class="input-group">
+                <label>Registration Role</label>
+                <select name="role" required>
+                    <option value="" disabled selected>Select your role...</option>
+                    <option value="Patient">Patient</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Nurse">Nurse</option>
+                    <option value="Pharmacist">Pharmacist</option>
+                    <option value="LabTech">Lab Technician</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+    </div>
+
+    <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>
