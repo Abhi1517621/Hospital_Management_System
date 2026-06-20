@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareFlow Hospital Network</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #ecf0f1; color: #2c3e50; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        .hero-container { background: white; padding: 50px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 600px; width: 90%; }
+        .hero-container h1 { color: #2980b9; margin-bottom: 10px; font-size: 2.5em; }
+        .hero-container p { font-size: 1.1em; color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
+        
+        .btn { display: inline-block; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; transition: all 0.3s ease; margin: 10px; }
+        .btn-primary { background: #3498db; color: white; border: 2px solid #3498db; }
+        .btn-primary:hover { background: #2980b9; }
+        
+        .btn-outline { background: transparent; color: #e74c3c; border: 2px solid #e74c3c; }
+        .btn-outline:hover { background: #e74c3c; color: white; }
+
+        .auth-badge { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="hero-container">
+        <h1>CareFlow Enterprise</h1>
+        <p>A fully integrated, role-based hospital management architecture ensuring seamless clinical workflows and transparent billing.</p>
+
+        {% if user.is_authenticated %}
+            <div class="auth-badge">
+                <span style="color: gray; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Current Active Session</span><br>
+                <strong style="font-size: 18px; color: #2c3e50;">{{ user.get_full_name|default:user.email }}</strong><br>
+                <span style="color: #27ae60; font-weight: bold;">Role: {{ user.role }}</span>
+            </div>
+            
+            <br>
+            
+            <a href="{% url 'dashboard' %}" class="btn btn-primary">Enter Dashboard</a>
+            
+            <a href="{% url 'logout' %}" class="btn btn-outline">Log Out to Switch Roles</a>
+            
+        {% else %}
+            <a href="{% url 'auth_gateway' %}" class="btn btn-primary">Log In to System</a>
+        {% endif %}
+    </div>
+
+</body>
+</html>
