@@ -10,4 +10,4 @@ urlpatterns = [
     path('lab/dashboard/', views.lab_dashboard, name='lab_dashboard'),
     path('lab/process/<uuid:report_id>/', views.process_lab_test, name='process_lab_test'),
     path('doctor/discharge/<uuid:admission_id>/', views.discharge_patient, name='discharge_patient'),
-]
+    ]
