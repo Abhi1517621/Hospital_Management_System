@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Invoice Breakdown</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
+        .receipt { background: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .line-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ccc; }
+        .total-row { display: flex; justify-content: space-between; padding: 15px 0; font-size: 18px; font-weight: bold; border-top: 2px solid #333; margin-top: 10px; }
+        .btn-back { display: inline-block; margin-bottom: 20px; color: #3498db; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <a href="{% url 'patient_dashboard' %}" class="btn-back">← Back to Dashboard</a>
+        
+        <h2>Hospital Invoice</h2>
+        <p style="color: gray; font-size: 14px;">Invoice ID: {{ invoice.id }}<br>Date: {{ invoice.generated_at|date:"M d, Y" }}</p>
+        <p><strong>Patient:</strong> {{ invoice.patient.get_full_name }}</p>
+        
+        <h4 style="margin-top: 30px; color: #2c3e50;">Itemized Charges</h4>
+
+        {% if consultation %}
+            <div class="line-item">
+                <span>Doctor Consultation (Dr. {{ consultation.appointment.doctor.last_name }})</span>
+                <span>₹{{ consultation.charged_fee }}</span>
+            </div>
+        {% endif %}
+
+        {% for lab in lab_items %}
+            <div class="line-item">
+                <span>Lab Requisition: {{ lab.lab_report.lab_test.test_name }}</span>
+                <span>₹{{ lab.charged_fee }}</span>
+            </div>
+        {% endfor %}
+
+        {% for med in pharmacy_items %}
+            <div class="line-item">
+                <span>Pharmacy: {{ med.prescription_item.medicine.name }} (Qty: {{ med.prescription_item.quantity_dispensed }})</span>
+                <span>₹{{ med.charged_unit_price }}</span>
+            </div>
+        {% endfor %}
+
+        {% if room_items %}
+            <div class="line-item">
+                <span>Inpatient Ward: Room {{ room_items.admission.bed.room_number }} ({{ room_items.days_billed }} days at ₹{{ room_items.charged_daily_rate }}/day)</span>
+                <span>₹{% widthratio room_items.days_billed 1 room_items.charged_daily_rate %}</span>
+            </div>
+        {% endif %}
+
+        <div class="total-row">
+            <span>Total Amount Due</span>
+            <span>₹{{ invoice.total_amount }}</span>
+        </div>
+
+        {% if invoice.status == 'Unpaid' %}
+            <form method="POST" action="{% url 'pay_invoice' invoice.id %}" style="margin-top: 20px; text-align: center;">
+                {% csrf_token %}
+                <button type="submit" style="background: #e74c3c; color: white; padding: 12px 20px; border: none; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                    Pay ₹{{ invoice.total_amount }} Securely
+                </button>
+            </form>
+        {% else %}
+            <div style="margin-top: 20px; text-align: center; background: #27ae60; color: white; padding: 12px; border-radius: 4px; font-weight: bold;">
+                PAID IN FULL ✓
+            </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
