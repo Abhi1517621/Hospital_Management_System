@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Update Profile</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
+        .container { background: white; padding: 30px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 20px; box-sizing: border-box; }
+        button { background: #16a085; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; border-radius: 4px;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update Medical Profile</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Blood Group</label>
+            <input type="text" name="blood_group" value="{{ profile.blood_group|default:'' }}" placeholder="e.g., O+, AB-">
+            
+            <label>Emergency Contact</label>
+            <input type="text" name="emergency_contact" value="{{ profile.emergency_contact|default:'' }}" placeholder="e.g., 9876543210">
+            
+            <button type="submit">Save Profile</button>
+        </form>
+    </div>
+</body>
+</html>

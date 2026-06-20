@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Consultation Room</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
+        .container { background: white; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 100px; margin-top: 10px; margin-bottom: 20px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn-submit { background: #2ecc71; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
+        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: #7f8c8d; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 style="color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px;">Active Consultation</h2>
+        
+        <p><strong>Patient UUID:</strong> {{ appointment.patient.id }}</p>
+        <p><strong>Reason/Notes:</strong> {{ appointment.notes }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <label><strong>Official Diagnosis</strong></label>
+            <textarea name="diagnosis" placeholder="Enter clinical diagnosis here..." required></textarea>
+
+            <label><strong>Prescription & Care Notes</strong></label>
+            <textarea name="prescription_notes" placeholder="e.g., Prescribe Paracetamol 500mg twice daily..."></textarea>
+            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Prescribe Medication (Optional)</h4>
+            
+           <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <div style="flex: 2;">
+                    <label><strong>Medicine</strong></label>
+                    <select name="medicine_id" style="width: 100%; padding: 10px;">
+                        <option value="">-- No Medication Needed --</option>
+                        {% for med in medicines %}
+                            <option value="{{ med.id }}">{{ med.name }} (Stock: {{ med.current_stock_quantity }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <label><strong>Dosage</strong></label>
+                    <input type="text" name="dosage" placeholder="e.g., 2x Daily" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                </div>
+                <div style="flex: 1;">
+                    <label><strong>Quantity</strong></label>
+                    <input type="number" name="quantity" placeholder="Qty" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                </div>
+            </div>
+
+            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Order Laboratory Tests (Optional)</h4>
+            <div style="margin-bottom: 20px;">
+                <label><strong>Select Lab Test</strong></label>
+                <select name="lab_test_id" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                    <option value="">-- No Lab Test Required --</option>
+                    {% for test in lab_tests %}
+                        <option value="{{ test.id }}">{{ test.test_name }} ({{ test.department }}) - ₹{{ test.current_cost }}</option>
+                    {% endfor %}
+                </select>
+                <p style="font-size: 12px; color: gray; margin-top: 5px;">Selecting a test will automatically send a requisition to the Lab Technician's queue.</p>
+            </div>
+            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Hospital Admission (Optional)</h4>
+            <div style="margin-bottom: 20px;">
+                <label><strong>Assign to Inpatient Ward</strong></label>
+                <select name="bed_id" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                    <option value="">-- No Admission Required (Discharge Home) --</option>
+                    {% for bed in available_beds %}
+                        <option value="{{ bed.id }}">Room {{ bed.room_number }} - {{ bed.type }} (₹{{ bed.current_cost_per_day }}/day)</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-submit">Sign & Complete Consultation</button>
+            <a href="{% url 'doctor_dashboard' %}" class="btn-cancel">Cancel & Return</a>
+        </form>
+    </div>
+
+</body>
+</html>

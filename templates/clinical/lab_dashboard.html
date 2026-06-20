@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Laboratory Dashboard</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .header { background: #e67e22; color: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; }
+        .card { background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table th, .table td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        .btn-process { background: #3498db; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Laboratory Portal: {{ request.user.get_full_name }}</h2>
+        <a href="{% url 'logout' %}" style="color: white; text-decoration: underline;">Log Out</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: #d4edda; color: #155724; padding: 10px; margin-top: 10px; border-radius: 4px;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <h3>Pending Lab Requisitions</h3>
+        {% if pending_tests %}
+            <table class="table">
+                <tr>
+                    <th>Date Ordered</th>
+                    <th>Patient</th>
+                    <th>Test Required</th>
+                    <th>Action</th>
+                </tr>
+                {% for test in pending_tests %}
+                <tr>
+                    <td>{{ test.generated_at|date:"M d, Y" }}</td>
+                    <td>{{ test.patient.get_full_name }}</td>
+                    <td><strong>{{ test.lab_test.test_name }}</strong></td>
+                    <td><a href="{% url 'process_lab_test' test.id %}" class="btn-process">Enter Results</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No pending tests. The queue is clear.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

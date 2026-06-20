@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Doctor Dashboard</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between;}
+        .card { background: white; padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h2>Dr. {{ request.user.get_full_name }}</h2>
+            <p>{{ doctor_profile.specialization }} | Fee: ₹{{ doctor_profile.base_consultation_fee }}</p>
+        </div>
+        <div>
+            <a href="{% url 'logout' %}" style="color: #e74c3c; text-decoration: none; background: white; padding: 8px; border-radius: 4px;">Log Out</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Today's Schedule ({{ today }})</h3>
+        {% if appointments %}
+            <ul style="list-style: none; padding: 0;">
+                {% for appt in appointments %}
+                    <li style="padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 5px;">
+                        <strong>{{ appt.scheduled_time|time:"H:i" }}</strong> - 
+                        Patient: <strong>{{ appt.patient.get_full_name }}</strong> 
+                        <span style="color: gray; font-size: 14px;">({{ appt.status }})</span>
+                        
+                        {% if appt.status == 'Scheduled' or appt.status == 'In-Progress' %}
+                            <a href="{% url 'consultation' appt.id %}" style="margin-left: 15px; background: #3498db; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 13px;">Start Consultation</a>
+                        {% endif %}
+                        
+                        {% if appt.patient.id in admitted_patient_ids %}
+                            <span style="margin-left: 10px; background: #7f8c8d; color: white; padding: 5px 10px; border-radius: 4px; font-size: 13px; cursor: not-allowed;">Currently Admitted</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No appointments scheduled for today.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card" style="margin-top: 20px; border-top: 4px solid #9b59b6;">
+        <h3 style="color: #8e44ad;">My Inpatient Ward (Active Admissions)</h3>
+        {% if active_admissions %}
+            <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                <tr>
+                    <th style="padding: 10px; border-bottom: 2px solid #eee;">Patient</th>
+                    <th style="padding: 10px; border-bottom: 2px solid #eee;">Room (Type)</th>
+                    <th style="padding: 10px; border-bottom: 2px solid #eee;">Admitted On</th>
+                    <th style="padding: 10px; border-bottom: 2px solid #eee;">Action</th>
+                </tr>
+                {% for admission in active_admissions %}
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>{{ admission.patient.get_full_name }}</strong></td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ admission.bed.room_number }} ({{ admission.bed.type }})</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ admission.admitted_at|date:"M d, Y" }}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <form method="POST" action="{% url 'discharge_patient' admission.id %}">
+                            {% csrf_token %}
+                            <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Discharge</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>You have no admitted patients currently.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
