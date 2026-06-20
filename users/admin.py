@@ -1,14 +1,13 @@
 from django.contrib import admin
-from .models import CustomUser, StaffProfile
+from .models import CustomUser, StaffProfile, PatientProfile, StaffLicenses
 
-@admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'role', 'id', 'is_active', 'created_at')
-    list_filter = ('role', 'is_active')
-    search_fields = ('email', 'id')
-    readonly_fields = ('id', 'created_at', 'updated_at', 'deleted_at')
+# Register the core models exactly ONCE
+admin.site.register(CustomUser)
+admin.site.register(StaffProfile)
+admin.site.register(PatientProfile)
 
-@admin.register(StaffProfile)
-class StaffProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'specialization', 'clearance_level')
-    search_fields = ('user__email', 'specialization')
+# Register the licenses with a custom view
+@admin.register(StaffLicenses)
+class StaffLicensesAdmin(admin.ModelAdmin):
+    list_display = ('staff', 'license_type', 'license_number', 'expiry_date')
+    search_fields = ('license_number',)

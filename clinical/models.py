@@ -26,8 +26,8 @@ class PrescriptionItems(models.Model):
     medical_record = models.ForeignKey(MedicalRecords, on_delete=models.CASCADE, related_name='prescribed_items')
     medicine = models.ForeignKey(MedicineInventory, on_delete=models.PROTECT, related_name='prescriptions')
     dosage = models.CharField(max_length=100)
+    quantity_prescribed = models.IntegerField(default=1) 
     quantity_dispensed = models.IntegerField(default=0)
-
 class LabReports(models.Model):
     STATUS_CHOICES = [('Pending', 'Pending'), ('Completed', 'Completed')]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -37,7 +37,7 @@ class LabReports(models.Model):
     result_data = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     generated_at = models.DateTimeField(auto_now_add=True)
-
+    appointment = models.ForeignKey(Appointments, on_delete=models.CASCADE, related_name='lab_reports', null=True, blank=True)
 class Admissions(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role': 'Patient'}, related_name='admissions_as_patient')
@@ -45,3 +45,4 @@ class Admissions(models.Model):
     attending_doctor = models.ForeignKey(CustomUser, on_delete=models.PROTECT, limit_choices_to={'role': 'Doctor'}, related_name='admissions_as_doctor')
     admitted_at = models.DateTimeField(auto_now_add=True)
     discharged_at = models.DateTimeField(null=True, blank=True)
+    appointment = models.ForeignKey(Appointments, on_delete=models.CASCADE, related_name='admissions', null=True, blank=True)

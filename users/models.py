@@ -26,6 +26,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
+    
+    # --- NEW FIELDS ---
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    # ------------------
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     
     is_staff = models.BooleanField(default=False)
@@ -37,6 +43,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['role']
+
+    # Adding a helper method is a great practice
+    def get_full_name(self):
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        return self.email # Fallback to email if name is missing
 
     def delete(self, *args, **kwargs):
         self.deleted_at = timezone.now()
