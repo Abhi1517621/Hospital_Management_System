@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Complete Profile</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 40px; }
+        .form-box { background: white; padding: 30px; border-radius: 8px; max-width: 500px; margin: auto; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background: #2ecc71; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Doctor Onboarding</h2>
+        <p>Please provide your clinical credentials to access the system.</p>
+        <form method="POST">
+            {% csrf_token %}
+            <h4>Profile Details</h4>
+            <input type="text" name="specialization" placeholder="Specialization (e.g., Cardiology)" required>
+            <input type="number" step="0.01" name="base_consultation_fee" placeholder="Consultation Fee (₹)" required>
+            
+            <h4>Medical License</h4>
+            <input type="text" name="license_type" placeholder="License Type (e.g., State Medical Council)" required>
+            <input type="text" name="license_number" placeholder="License Number" required>
+            <label>Expiry Date</label>
+            <input type="date" name="expiry_date" required>
+            
+            <button type="submit">Submit Credentials</button>
+        </form>
+    </div>
+</body>
+</html>
