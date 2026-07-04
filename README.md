@@ -1,196 +1,69 @@
-erDiagram
-    %% --- CORE IDENTITIES ---
-    Users {
-        uuid id PK
-        string email UK
-        string password_hash
-        string role "ENUM: Admin, Doctor, Nurse, LabTech, Pharmacist, Patient"
-        datetime created_at
-        datetime updated_at
-        datetime deleted_at "Soft delete"
-    }
+# CareFlow Enterprise: Hospital Management System
 
-StaffProfile {
-    uuid user_id PK, FK "References Users.id"
-    string specialization
-    int clearance_level 
-    decimal base_consultation_fee 
-}
+An enterprise-grade, role-based Hospital Management System (HMS) built with Django. 
 
-StaffLicenses {
-    uuid id PK
-    uuid staff_id FK "References StaffProfile.user_id"
-    string license_type "e.g., Medical Board, Pharmacy Council"
-    string license_number UK
-    date expiry_date
-}
+I built CareFlow because I wanted to move beyond basic CRUD applications and tackle the messy, real-world edge cases of enterprise software. This project doesn't just store data; it handles concurrent database transactions, enforces strict financial ledgers, manages timezone-aware scheduling, and strictly governs state transitions across four different user roles while providing a seamless UX for the hospital staff.
 
-PatientProfile {
-    uuid user_id PK, FK "References Users.id"
-    string blood_group
-    string emergency_contact
-}
+## Project Overview
+At its core, CareFlow simulates a living hospital workflow. When a patient books an appointment, the system enforces timezone-aware availability windows. When a doctor writes a prescription or orders lab work, the system locks that data and routes it directly to the pharmacist and lab technician queues. Every single action taken by any staff member is mathematically routed back to a strictly mapped, itemized financial ledger for the patient.
 
-%% --- OPERATIONS & SCHEDULING ---
-Appointments {
-    uuid id PK
-    uuid patient_id FK
-    uuid doctor_id FK
-    datetime scheduled_time
-    string status "ENUM: Scheduled, In-Progress, Completed, Cancelled"
-    text notes
-}
+## Database Architecture & ER Diagram
+To handle the complex relationships between clinical actions and financial billing, the database is highly normalized. 
 
-Beds {
-    uuid id PK
-    string room_number
-    string type "ENUM: ICU, General, etc."
-    decimal current_cost_per_day
-}
+Below is the Entity-Relationship (ER) diagram mapping out the core architecture. Notice how the base User model extends into specific profiles, and how the Inventory, Clinical, and Ward modules all route their foreign keys directly into the centralized `LedgerEntries` table to enforce strict state management and billing accuracy.
 
-Admissions {
-    uuid id PK
-    uuid patient_id FK
-    uuid bed_id FK
-    uuid attending_doctor_id FK
-    datetime admitted_at
-    datetime discharged_at "Nullable"
-}
+![CareFlow ER Diagram](image_ad358f.jpg)
 
-MedicalRecords {
-    uuid id PK
-    uuid appointment_id FK "Nullable. Links record to specific visit"
-    uuid patient_id FK
-    uuid doctor_id FK
-    text diagnosis
-    text prescription_notes
-    datetime created_at
-}
+## Technical Highlights
+If we are discussing this in an interview, these are the architectural challenges and design decisions I can speak to in depth:
 
-%% --- PHARMACY & INVENTORY CONCURRENCY ---
-MedicineInventory {
-    uuid id PK
-    string name
-    string manufacturer
-    int current_stock_quantity
-    decimal current_unit_price
-}
+* ACID Transactions & Concurrency Locks: 
+  I used Django's transaction.atomic and select_for_update in the pharmacy dispensing engine. This guarantees that if two pharmacists try to dispense the last remaining bottle of medication at the exact same millisecond, the database row is locked, preventing negative inventory balances.
 
-InventoryTransactions {
-    uuid id PK
-    uuid medicine_id FK
-    string transaction_type "ENUM: Restock, Dispense, Adjustment"
-    int quantity_change "Positive or Negative"
-    datetime timestamp
-}
+* The Master Ledger Routing: 
+  Initially, unpaid charges were floating and loosely attached to patients. I refactored the database schema to use a centralized LedgerEntries table (as seen in the ER diagram). Now, every department routes their specific foreign keys (admission_id, consultation_id, prescription_item_id, lab_report_id) directly to the ledger, generating perfectly isolated, itemized financial records that cannot be duplicated.
 
-PrescriptionItems {
-    uuid id PK
-    uuid medical_record_id FK
-    uuid medicine_id FK
-    string dosage
-    int quantity_dispensed
-}
+* The Timezone Trap: 
+  I implemented two-layer validation for appointment booking. The HTML5 frontend restricts date selection, but the backend parses the incoming strings into timezone-aware datetime objects and mathematically compares them against the server's atomic clock to prevent malicious API POST requests from booking past dates.
 
-%% --- LAB MODULE ---
-LabTestCatalog {
-    uuid id PK
-    string test_name
-    string department
-    decimal current_cost
-}
+* Strict Clinical State Machines: 
+  The backend is heavily fortified against edge cases. Doctors cannot double-admit a patient already in a bed, discharged patients cannot be re-discharged, and pharmacists are physically locked out of dispensing more or less medication than the doctor explicitly prescribed in the PrescriptionItems table.
 
-LabReports {
-    uuid id PK
-    uuid patient_id FK
-    uuid lab_test_id FK
-    uuid technician_id FK 
-    text result_data
-    string status "ENUM: Pending, Completed"
-    datetime completed_at
-}
+## System Roles & Workflows
+The system uses a custom User model segmented into distinct operational roles. If a user attempts to access a view outside their clearance, they are blocked by a custom role-based access control (RBAC) system.
 
-%% --- THE BILLING ENGINE ---
-Invoices {
-    uuid id PK
-    uuid patient_id FK
-    decimal total_amount
-    string status "ENUM: Draft, Unpaid, Paid"
-    datetime generated_at
-}
+1. Patients: Can book appointments within a strict 3-day rolling window and view itemized ledger entries.
+2. Doctors: Manage the consultation room, diagnose, prescribe drugs, order lab tests, and admit/discharge patients to the inpatient ward.
+3. Pharmacists: Monitor the prescription queue and securely dispense inventory.
+4. Lab Technicians: Receive automated requisitions from the doctor, input bloodwork/test results, and clear the lab queue.
 
-%% Specific Charge Tables
-ConsultationCharges {
-    uuid id PK
-    uuid invoice_id FK
-    uuid appointment_id FK
-    decimal charged_fee 
-}
+## Tech Stack
+* Backend: Python, Django, Django ORM
+* Frontend: HTML5, CSS3, Django Templates
+* Database: SQLite (Development) / PostgreSQL-ready (Production)
+* Architecture: MVT (Model-View-Template), Atomic Financial Ledgers
 
-PharmacyCharges {
-    uuid id PK
-    uuid invoice_id FK
-    uuid prescription_item_id FK
-    decimal charged_unit_price 
-}
+## How to Run Locally
 
-LabCharges {
-    uuid id PK
-    uuid invoice_id FK
-    uuid lab_report_id FK
-    decimal charged_cost 
-}
+1. Clone the repository:
+   git clone https://github.com/yourusername/careflow-hms.git
+   cd careflow-hms
 
-RoomCharges {
-    uuid id PK
-    uuid invoice_id FK
-    uuid admission_id FK
-    int days_billed
-    decimal charged_daily_rate 
-}
+2. Set up the virtual environment:
+   python -m venv venv
+   source venv/bin/activate  # On Windows use: venv\Scripts\activate
 
-%% --- RELATIONSHIPS ---
-Users ||--o| StaffProfile : "extends"
-Users ||--o| PatientProfile : "extends"
-StaffProfile ||--o{ StaffLicenses : "holds"
+3. Install dependencies:
+   pip install -r requirements.txt
 
-PatientProfile ||--o{ Appointments : "books"
-StaffProfile ||--o{ Appointments : "conducts"
-Appointments ||--o| MedicalRecords : "results in"
+4. Run database migrations:
+   python manage.py makemigrations
+   python manage.py migrate
 
-PatientProfile ||--o{ Admissions : "undergoes"
-Beds ||--o{ Admissions : "hosts"
-StaffProfile ||--o{ Admissions : "attends"
+5. Create the master administrator:
+   python manage.py createsuperuser
 
-PatientProfile ||--o{ MedicalRecords : "owns"
-StaffProfile ||--o{ MedicalRecords : "creates"
+6. Boot the server:
+   python manage.py runserver
 
-MedicalRecords ||--o{ PrescriptionItems : "contains"
-MedicineInventory ||--o{ PrescriptionItems : "dispensed as"
-MedicineInventory ||--o{ InventoryTransactions : "tracks history"
-
-PatientProfile ||--o{ LabReports : "takes"
-LabTestCatalog ||--o{ LabReports : "defines"
-StaffProfile ||--o{ LabReports : "conducts"
-
-%% Billing Relationships
-PatientProfile ||--o{ Invoices : "receives"
-Invoices ||--o{ ConsultationCharges : "includes"
-Invoices ||--o{ PharmacyCharges : "includes"
-Invoices ||--o{ LabCharges : "includes"
-Invoices ||--o{ RoomCharges : "includes"
-
-Appointments ||--o{ ConsultationCharges : "generates"
-PrescriptionItems ||--o| PharmacyCharges : "generates"
-LabReports ||--o| LabCharges : "generates"
-Admissions ||--o{ RoomCharges : "generates"
-
-Key Design Choices:
-
-Clean Billing Structure: Instead of using one massive ledger table packed with empty (null) columns to track different types of expenses, I broke the billing down into specific tables (like ConsultationCharges and PharmacyCharges). These all roll up cleanly into a main Invoices table, making the database much faster to query and easier to maintain.
-
-Tracking Historical Prices: In a real hospital, if the price of a medicine goes up today, it shouldn't change the bill of a patient who was discharged yesterday. I designed the charge tables to capture and freeze the exact price at the time of the transaction, protecting past financial records from future catalog updates.
-
-Safe Pharmacy Inventory: Managing medicine stock by just updating a single number can cause race conditions if two pharmacists try to dispense the same drug at the exact same millisecond. To fix this, I implemented an InventoryTransactions table. It works like a bank statement, logging every single addition or removal of a drug step-by-step to prevent bugs and keep an accurate audit trail.
-
-Realistic Scheduling Flow: I included an Appointments table to map out how a hospital actually works. It sets up a logical chain of events: a patient books a slot, that appointment results in a medical record, and that specific record generates the bill.
+   Navigate to http://127.0.0.1:8000/ to see the smart routing homepage.
