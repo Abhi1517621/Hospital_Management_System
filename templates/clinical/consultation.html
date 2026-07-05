@@ -1,78 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Consultation Room</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
-        .container { background: white; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        textarea { width: 100%; height: 100px; margin-top: 10px; margin-bottom: 20px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-submit { background: #2ecc71; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
-        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: #7f8c8d; text-decoration: none; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
 
-    <div class="container">
-        <h2 style="color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px;">Active Consultation</h2>
+{% block content %}
+<div class="d-flex justify-content-center align-items-center animate__animated animate__fadeIn" style="min-height: 75vh;">
+    <div class="card shadow-lg p-4 p-md-5" style="max-width: 800px; width: 100%; border-radius: 15px;">
         
-        <p><strong>Patient UUID:</strong> {{ appointment.patient.id }}</p>
-        <p><strong>Reason/Notes:</strong> {{ appointment.notes }}</p>
+        <!-- Header -->
+        <div class="border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
+            <h3 class="fw-bold text-primary mb-0"><i class="fa-solid fa-notes-medical me-2"></i> Active Consultation</h3>
+            <span class="badge bg-danger rounded-pill px-3 py-2 animate__animated animate__pulse animate__infinite">Live Session</span>
+        </div>
+        
+        <!-- Patient Info Context -->
+        <div class="alert alert-light border mb-4">
+            <p class="mb-1"><strong><i class="fa-solid fa-id-card text-muted me-1"></i> Patient UUID:</strong> <span class="font-monospace text-primary">{{ appointment.patient.id }}</span></p>
+            <p class="mb-0"><strong><i class="fa-solid fa-comment-medical text-muted me-1"></i> Reason/Notes:</strong> {{ appointment.notes }}</p>
+        </div>
 
         <form method="POST">
             {% csrf_token %}
             
-            <label><strong>Official Diagnosis</strong></label>
-            <textarea name="diagnosis" placeholder="Enter clinical diagnosis here..." required></textarea>
+            <!-- Diagnosis & Notes -->
+            <div class="mb-4">
+                <label class="form-label text-dark fw-bold">Official Diagnosis</label>
+                <textarea name="diagnosis" class="form-control bg-light border-0" rows="3" placeholder="Enter clinical diagnosis here..." required></textarea>
+            </div>
 
-            <label><strong>Prescription & Care Notes</strong></label>
-            <textarea name="prescription_notes" placeholder="e.g., Prescribe Paracetamol 500mg twice daily..."></textarea>
-            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Prescribe Medication (Optional)</h4>
-            
-           <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                <div style="flex: 2;">
-                    <label><strong>Medicine</strong></label>
-                    <select name="medicine_id" style="width: 100%; padding: 10px;">
+            <div class="mb-4">
+                <label class="form-label text-dark fw-bold">Prescription & Care Notes</label>
+                <textarea name="prescription_notes" class="form-control bg-light border-0" rows="3" placeholder="e.g., Prescribe Paracetamol 500mg twice daily..."></textarea>
+            </div>
+
+            <!-- Medication Ordering -->
+            <h5 class="fw-bold text-primary border-bottom pb-2 mt-5 mb-3"><i class="fa-solid fa-pills me-2"></i> Prescribe Medication <span class="text-muted fw-normal fs-6">(Optional)</span></h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label text-muted fw-bold">Medicine</label>
+                    <select name="medicine_id" class="form-select bg-light border-0">
                         <option value="">-- No Medication Needed --</option>
                         {% for med in medicines %}
                             <option value="{{ med.id }}">{{ med.name }} (Stock: {{ med.current_stock_quantity }})</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div style="flex: 1;">
-                    <label><strong>Dosage</strong></label>
-                    <input type="text" name="dosage" placeholder="e.g., 2x Daily" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                <div class="col-md-3">
+                    <label class="form-label text-muted fw-bold">Dosage</label>
+                    <input type="text" name="dosage" class="form-control bg-light border-0" placeholder="e.g., 2x Daily">
                 </div>
-                <div style="flex: 1;">
-                    <label><strong>Quantity</strong></label>
-                    <input type="number" name="quantity" placeholder="Qty" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                <div class="col-md-3">
+                    <label class="form-label text-muted fw-bold">Quantity</label>
+                    <input type="number" name="quantity" class="form-control bg-light border-0" placeholder="Qty">
                 </div>
             </div>
 
-            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Order Laboratory Tests (Optional)</h4>
-            <div style="margin-bottom: 20px;">
-                <label><strong>Select Lab Test</strong></label>
-                <select name="lab_test_id" style="width: 100%; padding: 10px; box-sizing: border-box;">
+            <!-- Lab Ordering -->
+            <h5 class="fw-bold text-primary border-bottom pb-2 mt-5 mb-3"><i class="fa-solid fa-microscope me-2"></i> Order Laboratory Tests <span class="text-muted fw-normal fs-6">(Optional)</span></h5>
+            <div class="mb-4">
+                <label class="form-label text-muted fw-bold">Select Lab Test</label>
+                <select name="lab_test_id" class="form-select bg-light border-0">
                     <option value="">-- No Lab Test Required --</option>
                     {% for test in lab_tests %}
                         <option value="{{ test.id }}">{{ test.test_name }} ({{ test.department }}) - ₹{{ test.current_cost }}</option>
                     {% endfor %}
                 </select>
-                <p style="font-size: 12px; color: gray; margin-top: 5px;">Selecting a test will automatically send a requisition to the Lab Technician's queue.</p>
+                <div class="form-text mt-2"><i class="fa-solid fa-circle-info me-1 text-info"></i> Selecting a test will automatically send a requisition to the Lab Technician's queue.</div>
             </div>
-            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Hospital Admission (Optional)</h4>
-            <div style="margin-bottom: 20px;">
-                <label><strong>Assign to Inpatient Ward</strong></label>
-                <select name="bed_id" style="width: 100%; padding: 10px; box-sizing: border-box;">
+
+            <!-- Hospital Admission -->
+            <h5 class="fw-bold text-primary border-bottom pb-2 mt-5 mb-3"><i class="fa-solid fa-bed me-2"></i> Hospital Admission <span class="text-muted fw-normal fs-6">(Optional)</span></h5>
+            <div class="mb-5">
+                <label class="form-label text-muted fw-bold">Assign to Inpatient Ward</label>
+                <select name="bed_id" class="form-select bg-light border-0">
                     <option value="">-- No Admission Required (Discharge Home) --</option>
                     {% for bed in available_beds %}
                         <option value="{{ bed.id }}">Room {{ bed.room_number }} - {{ bed.type }} (₹{{ bed.current_cost_per_day }}/day)</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn-submit">Sign & Complete Consultation</button>
-            <a href="{% url 'doctor_dashboard' %}" class="btn-cancel">Cancel & Return</a>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.1rem;">
+                    Sign & Complete Consultation <i class="fa-solid fa-file-signature ms-2"></i>
+                </button>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'doctor_dashboard' %}" class="text-decoration-none text-muted fw-bold">Cancel & Return</a>
+            </div>
+            
         </form>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,71 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Invoice Breakdown</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
-        .receipt { background: white; max-width: 600px; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .line-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ccc; }
-        .total-row { display: flex; justify-content: space-between; padding: 15px 0; font-size: 18px; font-weight: bold; border-top: 2px solid #333; margin-top: 10px; }
-        .btn-back { display: inline-block; margin-bottom: 20px; color: #3498db; text-decoration: none; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <div class="receipt">
-        <a href="{% url 'patient_dashboard' %}" class="btn-back">← Back to Dashboard</a>
-        
-        <h2>Hospital Invoice</h2>
-        <p style="color: gray; font-size: 14px;">Invoice ID: {{ invoice.id }}<br>Date: {{ invoice.generated_at|date:"M d, Y" }}</p>
-        <p><strong>Patient:</strong> {{ invoice.patient.get_full_name }}</p>
-        
-        <h4 style="margin-top: 30px; color: #2c3e50;">Itemized Charges</h4>
+{% extends 'base.html' %}
 
-        {% if consultation %}
-            <div class="line-item">
+{% block content %}
+<div class="d-flex justify-content-center align-items-center animate__animated animate__fadeIn" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4 p-md-5" style="max-width: 650px; width: 100%; border-radius: 20px;">
+        
+        <a href="{% url 'patient_dashboard' %}" class="text-decoration-none text-muted mb-3 d-inline-block fw-bold">&larr; Back to Dashboard</a>
+        
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark"><i class="fa-solid fa-file-invoice me-2"></i> Hospital Invoice</h2>
+            <p class="text-muted">ID: <span class="font-monospace">{{ invoice.id }}</span> | Date: {{ invoice.generated_at|date:"M d, Y" }}</p>
+        </div>
+
+        <div class="mb-4">
+            <p class="mb-1 text-muted"><strong>Patient:</strong> {{ invoice.patient.get_full_name }}</p>
+        </div>
+
+        <div class="bg-light p-3 rounded mb-4">
+            <h5 class="fw-bold text-primary mb-3">Itemized Charges</h5>
+            
+            {% if consultation %}
+            <div class="d-flex justify-content-between mb-2">
                 <span>Doctor Consultation (Dr. {{ consultation.appointment.doctor.last_name }})</span>
-                <span>₹{{ consultation.charged_fee }}</span>
+                <span class="fw-bold">₹{{ consultation.charged_fee }}</span>
             </div>
-        {% endif %}
+            {% endif %}
 
-        {% for lab in lab_items %}
-            <div class="line-item">
+            {% for lab in lab_items %}
+            <div class="d-flex justify-content-between mb-2">
                 <span>Lab Requisition: {{ lab.lab_report.lab_test.test_name }}</span>
-                <span>₹{{ lab.charged_fee }}</span>
+                <span class="fw-bold">₹{{ lab.charged_fee }}</span>
             </div>
-        {% endfor %}
+            {% endfor %}
 
-        {% for med in pharmacy_items %}
-            <div class="line-item">
-                <span>Pharmacy: {{ med.prescription_item.medicine.name }} (Qty: {{ med.prescription_item.quantity_dispensed }})</span>
-                <span>₹{{ med.charged_unit_price }}</span>
+            {% for med in pharmacy_items %}
+            <div class="d-flex justify-content-between mb-2">
+                <span>Pharmacy: {{ med.prescription_item.medicine.name }} (x{{ med.prescription_item.quantity_dispensed }})</span>
+                <span class="fw-bold">₹{{ med.charged_unit_price }}</span>
             </div>
-        {% endfor %}
+            {% endfor %}
 
-        {% if room_items %}
-            <div class="line-item">
-                <span>Inpatient Ward: Room {{ room_items.admission.bed.room_number }} ({{ room_items.days_billed }} days at ₹{{ room_items.charged_daily_rate }}/day)</span>
-                <span>₹{% widthratio room_items.days_billed 1 room_items.charged_daily_rate %}</span>
+            {% if room_items %}
+            <div class="d-flex justify-content-between mb-2">
+                <span>Ward: Room {{ room_items.admission.bed.room_number }} ({{ room_items.days_billed }} days)</span>
+                <span class="fw-bold">₹{% widthratio room_items.days_billed 1 room_items.charged_daily_rate %}</span>
             </div>
-        {% endif %}
+            {% endif %}
+        </div>
 
-        <div class="total-row">
-            <span>Total Amount Due</span>
-            <span>₹{{ invoice.total_amount }}</span>
+        <div class="d-flex justify-content-between align-items-center py-3 border-top border-2">
+            <span class="fs-4 fw-bold">Total Amount Due</span>
+            <span class="fs-3 fw-bold text-primary">₹{{ invoice.total_amount }}</span>
         </div>
 
         {% if invoice.status == 'Unpaid' %}
-            <form method="POST" action="{% url 'pay_invoice' invoice.id %}" style="margin-top: 20px; text-align: center;">
+            <form method="POST" action="{% url 'pay_invoice' invoice.id %}">
                 {% csrf_token %}
-                <button type="submit" style="background: #e74c3c; color: white; padding: 12px 20px; border: none; width: 100%; border-radius: 4px; font-size: 16px; cursor: pointer;">
-                    Pay ₹{{ invoice.total_amount }} Securely
+                <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-bold fs-5 shadow-sm">
+                    <i class="fa-solid fa-credit-card me-2"></i> Pay ₹{{ invoice.total_amount }} Securely
                 </button>
             </form>
         {% else %}
-            <div style="margin-top: 20px; text-align: center; background: #27ae60; color: white; padding: 12px; border-radius: 4px; font-weight: bold;">
-                PAID IN FULL ✓
+            <div class="alert alert-success text-center fw-bold fs-5 rounded-pill shadow-sm">
+                <i class="fa-solid fa-circle-check me-2"></i> PAID IN FULL
             </div>
         {% endif %}
 
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,73 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HMS | Secure Gateway</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-</head>
-<body>
-    <div class="auth-container">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <p class="{{ message.tags }}">{{ message }}</p>
-                {% endfor %}
-            </div>
-        {% endif %}
+{% extends 'base.html' %}
+{% load static %}
 
-        <div class="auth-toggle">
-            <button id="show-login" class="active">Log In</button>
-            <button id="show-signup">Sign Up</button>
+{% block content %}
+<div class="container-fluid p-0 animate__animated animate__fadeIn" style="margin-top: -1.5rem;">
+    <div class="row g-0" style="min-height: calc(100vh - 70px);">
+        
+        <!-- Left Side: Inspiring Medical Image -->
+        <div class="col-lg-6 d-none d-lg-block" style="background: url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=1000&auto=format&fit=crop') center center / cover;">
+            <div class="h-100 w-100 d-flex align-items-end p-5" style="background: linear-gradient(transparent, rgba(26, 54, 93, 0.9));">
+                <div class="text-white">
+                    <h2 class="fw-bold display-5">Precision Care.</h2>
+                    <p class="fs-4">Empowering hospital staff with real-time data and strict state management.</p>
+                </div>
+            </div>
         </div>
 
-        <form id="login-form" method="POST" action="{% url 'auth_gateway' %}">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="login">
-            <h2>System Login</h2>
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
-            </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
-            </div>
-            <button type="submit" class="btn-primary">Authenticate</button>
-        </form>
+        <!-- Right Side: Authentication Forms -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-white py-5">
+            <div class="w-100 px-4 px-md-5" style="max-width: 550px;">
+                
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light text-primary rounded-circle mb-3" style="width: 70px; height: 70px;">
+                        <i class="fa-solid fa-fingerprint fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold" style="color: #1A365D;">System Gateway</h2>
+                    <p class="text-muted">Authenticate to access the internal hospital network.</p>
+                </div>
 
-        <form id="signup-form" method="POST" action="{% url 'auth_gateway' %}" style="display: none;">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="signup">
-            <h2>Register Profile</h2>
-            
-            <div class="input-group">
-                <input type="text" name="first_name" placeholder="First Name" required>
-                <input type="text" name="last_name" placeholder="Last Name" required>
-                <label>Registration Role</label>
-                <select name="role" required>
-                    <option value="" disabled selected>Select your role...</option>
-                    <option value="Patient">Patient</option>
-                    <option value="Doctor">Doctor</option>
-                    <option value="Nurse">Nurse</option>
-                    <option value="Pharmacist">Pharmacist</option>
-                    <option value="LabTech">Lab Technician</option>
-                </select>
-            </div>
+                <!-- Bootstrap Toggle Pills for Login / Signup -->
+                <ul class="nav nav-pills nav-justified mb-4 p-1 bg-light rounded-pill" id="authTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active rounded-pill fw-bold" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-pane" type="button" role="tab">Log In</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link rounded-pill fw-bold" id="signup-tab" data-bs-toggle="pill" data-bs-target="#signup-pane" type="button" role="tab">Sign Up</button>
+                    </li>
+                </ul>
 
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
+                <div class="tab-content" id="authTabContent">
+                    
+                    <!-- ================= LOGIN FORM ================= -->
+                    <div class="tab-pane fade show active animate__animated animate__fadeIn" id="login-pane" role="tabpanel" tabindex="0">
+                        <form method="POST" action="{% url 'auth_gateway' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="login">
+                            
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control rounded-4 bg-light border-0" id="loginEmail" name="email" placeholder="name@example.com" required>
+                                <label for="loginEmail" class="text-muted"><i class="fa-regular fa-envelope me-2"></i>Email address</label>
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control rounded-4 bg-light border-0" id="loginPassword" name="password" placeholder="Password" required>
+                                <label for="loginPassword" class="text-muted"><i class="fa-solid fa-key me-2"></i>Password</label>
+                            </div>
+
+                            <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm" type="submit" style="font-size: 1.1rem;">
+                                Authenticate <i class="fa-solid fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ================= SIGN UP FORM ================= -->
+                    <div class="tab-pane fade animate__animated animate__fadeIn" id="signup-pane" role="tabpanel" tabindex="0">
+                        <form method="POST" action="{% url 'auth_gateway' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="signup">
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-md-6 form-floating">
+                                    <input type="text" class="form-control rounded-4 bg-light border-0" id="firstName" name="first_name" placeholder="First Name" required>
+                                    <label for="firstName" class="text-muted ms-1">First Name</label>
+                                </div>
+                                <div class="col-md-6 form-floating">
+                                    <input type="text" class="form-control rounded-4 bg-light border-0" id="lastName" name="last_name" placeholder="Last Name" required>
+                                    <label for="lastName" class="text-muted ms-1">Last Name</label>
+                                </div>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <select class="form-select rounded-4 bg-light border-0 text-muted" id="roleSelect" name="role" required>
+                                    <option value="" disabled selected>Select your role...</option>
+                                    <option value="Patient">Patient</option>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Nurse">Nurse</option>
+                                    <option value="Pharmacist">Pharmacist</option>
+                                    <option value="LabTech">Lab Technician</option>
+                                </select>
+                                <label for="roleSelect" class="text-muted"><i class="fa-solid fa-id-badge me-2"></i>Registration Role</label>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control rounded-4 bg-light border-0" id="signupEmail" name="email" placeholder="name@example.com" required>
+                                <label for="signupEmail" class="text-muted"><i class="fa-regular fa-envelope me-2"></i>Email address</label>
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                <input type="password" class="form-control rounded-4 bg-light border-0" id="signupPassword" name="password" placeholder="Password" required>
+                                <label for="signupPassword" class="text-muted"><i class="fa-solid fa-key me-2"></i>Password</label>
+                            </div>
+
+                            <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-sm" type="submit" style="font-size: 1.1rem;">
+                                Create Account <i class="fa-solid fa-user-plus ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
             </div>
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
-            </div>
-            <button type="submit" class="btn-primary">Create Account</button>
-        </form>
+        </div>
+        
     </div>
-
-    <script src="{% static 'js/auth.js' %}"></script>
-</body>
-</html>
+</div>
+{% endblock %}

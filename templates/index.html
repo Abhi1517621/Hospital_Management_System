@@ -1,48 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareFlow Hospital Network</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #ecf0f1; color: #2c3e50; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-        .hero-container { background: white; padding: 50px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; max-width: 600px; width: 90%; }
-        .hero-container h1 { color: #2980b9; margin-bottom: 10px; font-size: 2.5em; }
-        .hero-container p { font-size: 1.1em; color: #7f8c8d; margin-bottom: 30px; line-height: 1.6; }
-        
-        .btn { display: inline-block; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; transition: all 0.3s ease; margin: 10px; }
-        .btn-primary { background: #3498db; color: white; border: 2px solid #3498db; }
-        .btn-primary:hover { background: #2980b9; }
-        
-        .btn-outline { background: transparent; color: #e74c3c; border: 2px solid #e74c3c; }
-        .btn-outline:hover { background: #e74c3c; color: white; }
+{% extends 'base.html' %}
 
-        .auth-badge { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: inline-block; }
-    </style>
-</head>
-<body>
+{% block content %}
+<!-- Full-width hero background mimicking a real hospital site -->
+<div class="position-fixed top-0 start-0 w-100 h-100" style="z-index: -1; background: linear-gradient(rgba(26, 54, 93, 0.7), rgba(26, 54, 93, 0.7)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2000&auto=format&fit=crop') no-repeat center center; background-size: cover;"></div>
 
-    <div class="hero-container">
-        <h1>CareFlow Enterprise</h1>
-        <p>A fully integrated, role-based hospital management architecture ensuring seamless clinical workflows and transparent billing.</p>
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh;">
+    
+    <!-- Animated Glass Card -->
+    <div class="card glass-card p-5 text-center shadow-lg animate__animated animate__fadeInUp" style="max-width: 650px; width: 100%; border-radius: 20px;">
+        
+        <div class="mb-4">
+            <i class="fa-solid fa-heart-pulse text-info" style="font-size: 4rem;"></i>
+        </div>
+        
+        <h1 class="mb-3" style="color: #1A365D; font-weight: 800; font-size: 2.5rem;">CareFlow Enterprise</h1>
+        <p class="text-secondary mb-5 fs-5">Next-generation clinical workflow and automated financial ledger architecture.</p>
 
         {% if user.is_authenticated %}
-            <div class="auth-badge">
-                <span style="color: gray; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Current Active Session</span><br>
-                <strong style="font-size: 18px; color: #2c3e50;">{{ user.get_full_name|default:user.email }}</strong><br>
-                <span style="color: #27ae60; font-weight: bold;">Role: {{ user.role }}</span>
+            <div class="alert bg-light border-0 shadow-sm mb-4 rounded-4 animate__animated animate__fadeIn">
+                <small class="text-uppercase text-muted fw-bold tracking-wide">Active Session Detected</small><br>
+                <div class="mt-2">
+                    <span class="fs-4 text-dark fw-bold">{{ user.get_full_name|default:user.email }}</span><br>
+                    <span class="text-info fw-bold fs-5"><i class="fa-solid fa-user-shield me-2"></i>{{ user.role }} Access Level</span>
+                </div>
             </div>
             
-            <br>
-            
-            <a href="{% url 'dashboard' %}" class="btn btn-primary">Enter Dashboard</a>
-            
-            <a href="{% url 'logout' %}" class="btn btn-outline">Log Out to Switch Roles</a>
-            
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">
+                    <i class="fa-solid fa-table-columns me-2"></i> Enter Workspace
+                </a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-secondary btn-lg px-5 rounded-pill">
+                    Switch Account
+                </a>
+            </div>
         {% else %}
-            <a href="{% url 'auth_gateway' %}" class="btn btn-primary">Log In to System</a>
+            <a href="{% url 'auth_gateway' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold animate__animated animate__pulse animate__infinite">
+                <i class="fa-solid fa-lock me-2"></i> Secure System Portal
+            </a>
         {% endif %}
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}

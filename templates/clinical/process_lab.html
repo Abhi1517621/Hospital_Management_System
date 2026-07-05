@@ -1,25 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Process Lab Test</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
-        .container { background: white; padding: 30px; border-radius: 8px; max-width: 600px; margin: auto; }
-        textarea { width: 100%; height: 150px; padding: 10px; margin-top: 10px; margin-bottom: 20px; box-sizing: border-box; }
-        .btn-submit { background: #2ecc71; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; border-radius: 4px;}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2 style="color: #e67e22;">Test: {{ report.lab_test.test_name }}</h2>
-        <p><strong>Patient:</strong> {{ report.patient.get_full_name }}</p>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center animate__animated animate__fadeIn" style="min-height: 70vh;">
+    <div class="card shadow-lg p-4 p-md-5" style="max-width: 650px; width: 100%; border-radius: 15px;">
+        
+        <div class="border-bottom pb-3 mb-4">
+            <h2 class="text-warning fw-bold mb-1"><i class="fa-solid fa-vial me-2"></i> Test: {{ report.lab_test.test_name }}</h2>
+            <p class="text-muted mb-0"><i class="fa-solid fa-user me-1"></i> Patient: <strong>{{ report.patient.get_full_name }}</strong></p>
+        </div>
         
         <form method="POST">
             {% csrf_token %}
-            <label><strong>Clinical Findings / Result Data</strong></label>
-            <textarea name="result_data" placeholder="Enter specific markers, counts, or radiology findings here..." required></textarea>
-            <button type="submit" class="btn-submit">Sign & Complete Test</button>
+            
+            <div class="mb-4">
+                <label class="form-label text-dark fw-bold"><i class="fa-solid fa-square-poll-vertical me-1"></i> Clinical Findings / Result Data</label>
+                <textarea 
+                    name="result_data" 
+                    class="form-control bg-light border-0 p-3" 
+                    rows="6" 
+                    placeholder="Enter specific markers, counts, or radiology findings here..." 
+                    required
+                ></textarea>
+            </div>
+            
+            <button type="submit" class="btn btn-warning w-100 py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.1rem;">
+                Sign & Complete Test <i class="fa-solid fa-check-circle ms-2"></i>
+            </button>
+            
+            <div class="text-center mt-3">
+                <a href="{% url 'lab_dashboard' %}" class="text-decoration-none text-muted fw-bold">Cancel & Return</a>
+            </div>
         </form>
+        
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

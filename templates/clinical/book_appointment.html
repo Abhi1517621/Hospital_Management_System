@@ -1,48 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Book Appointment</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 30px; }
-        .container { background: white; padding: 30px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 20px; box-sizing: border-box; }
-        button { background: #2ecc71; color: white; padding: 12px; border: none; width: 100%; cursor: pointer; border-radius: 4px;}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Schedule a Visit</h2>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center animate__animated animate__fadeIn" style="min-height: 70vh;">
+    <div class="card shadow-lg p-4 p-md-5" style="max-width: 600px; width: 100%; border-radius: 15px;">
+        
+        <div class="text-center mb-4">
+            <div class="d-inline-flex justify-content-center align-items-center bg-light text-success rounded-circle mb-3" style="width: 70px; height: 70px;">
+                <i class="fa-solid fa-calendar-plus fs-2"></i>
+            </div>
+            <h2 class="fw-bold text-primary">Schedule a Visit</h2>
+            <p class="text-muted">Book a consultation with our hospital specialists.</p>
+        </div>
+
         <form method="POST">
             {% csrf_token %}
             
-            <label>Select Doctor</label>
-            <select name="doctor_id" required>
-                <option value="" disabled selected>-- Choose a Specialist --</option>
-                {% for doc in doctors %}
-                    <option value="{{ doc.id }}">Dr. {{ doc.get_full_name }} ({{ doc.staff_profile.specialization }})</option>
-                {% endfor %}
-            </select>
+            <div class="mb-4">
+                <label class="form-label text-muted fw-bold"><i class="fa-solid fa-user-doctor me-1"></i> Select Doctor</label>
+                <select name="doctor_id" class="form-select rounded-3 py-2 bg-light border-0" required>
+                    <option value="" disabled selected>-- Choose a Specialist --</option>
+                    {% for doc in doctors %}
+                        <option value="{{ doc.id }}">Dr. {{ doc.get_full_name }} ({{ doc.staff_profile.specialization }})</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <div style="margin-bottom: 20px;">
-                <label><strong>Select Date and Time</strong></label>
+            <div class="mb-4">
+                <label class="form-label text-muted fw-bold"><i class="fa-regular fa-clock me-1"></i> Select Date and Time</label>
                 <input 
                     type="datetime-local" 
                     name="scheduled_time" 
+                    class="form-control rounded-3 py-2 bg-light border-0" 
                     required 
-                    style="width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box;"
                     min="{{ min_datetime }}" 
                     max="{{ max_datetime }}"
                 >
-                <p style="font-size: 12px; color: gray; margin-top: 5px;">
-                    *Appointments can only be booked for today or the next 3 days.
-                </p>
+                <div class="form-text text-warning fw-medium mt-2">
+                    <i class="fa-solid fa-circle-info me-1"></i> *Appointments can only be booked for today or the next 3 days.
+                </div>
             </div>
 
-            <label>Reason for Visit</label>
-            <textarea name="notes" rows="3" placeholder="Briefly describe your symptoms..."></textarea>
+            <div class="mb-4">
+                <label class="form-label text-muted fw-bold"><i class="fa-solid fa-notes-medical me-1"></i> Reason for Visit</label>
+                <textarea name="notes" rows="3" class="form-control rounded-3 bg-light border-0" placeholder="Briefly describe your symptoms..."></textarea>
+            </div>
             
-            <button type="submit">Confirm Booking</button>
+            <button type="submit" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-sm" style="font-size: 1.1rem;">
+                Confirm Booking <i class="fa-solid fa-check ms-2"></i>
+            </button>
+            
+            <div class="text-center mt-3">
+                <a href="javascript:history.back()" class="text-decoration-none text-muted">Cancel and return</a>
+            </div>
         </form>
+
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
