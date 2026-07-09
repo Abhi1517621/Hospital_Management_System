@@ -14,7 +14,7 @@
         </div>
         
         <h1 class="mb-3" style="color: #1A365D; font-weight: 800; font-size: 2.5rem;">CareFlow Enterprise</h1>
-        <p class="text-secondary mb-5 fs-5">Next-generation clinical workflow and automated financial ledger architecture.</p>
+        <p class="text-secondary mb-5 fs-5">Next-generation clinical workflow.</p>
 
         {% if user.is_authenticated %}
             <div class="alert bg-light border-0 shadow-sm mb-4 rounded-4 animate__animated animate__fadeIn">
@@ -35,7 +35,7 @@
             </div>
         {% else %}
             <a href="{% url 'auth_gateway' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow fw-bold animate__animated animate__pulse animate__infinite">
-                <i class="fa-solid fa-lock me-2"></i> Secure System Portal
+                <i class="fa-solid fa-lock me-2"></i>System Portal
             </a>
         {% endif %}
     </div>
