@@ -2,7 +2,7 @@
 
 ###  **[Experience the Live Application Here](https://hospital-management-system-p427.onrender.com/)**
 
-# CareFlow Enterprise: Hospital Management System
+## CareFlow Enterprise: Hospital Management System
 
 CareFlow is a role-based Hospital Management System (HMS) built with Django. It tackles race conditions, enforces strict financial ledgers, handles timezone-aware scheduling, and governs complex state transitions across multiple user roles—all while delivering a seamless UX for the hospital staff
 
@@ -17,8 +17,6 @@ At its core, CareFlow simulates a living hospital workflow. When a patient books
 ## Database Architecture & Entity-Relationship Diagram
 
 The Entity-Relationship (ER) diagram below is rendered dynamically using Mermaid.js.
-
-To handle the complex relationships between clinical actions and financial billing, the database is highly normalized. Notice how the base User model extends into specific profiles, and how the Inventory, Clinical, and Ward modules all route their foreign keys directly into centralized billing tables to enforce absolute billing accuracy.
 
 ```mermaid
 erDiagram
