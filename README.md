@@ -5,6 +5,7 @@
 # CareFlow Enterprise: Hospital Management System
 
 CareFlow is a role-based Hospital Management System (HMS) built with Django. It tackles race conditions, enforces strict financial ledgers, handles timezone-aware scheduling, and governs complex state transitions across multiple user roles—all while delivering a seamless UX for the hospital staff
+
 ---
 
 ## Project Overview
@@ -210,7 +211,6 @@ erDiagram
 ---
 
 ## Technical Highlights
-
 
 *   **ACID Transactions & Concurrency Locks:** I used Django's `transaction.atomic` and `select_for_update` in the pharmacy dispensing engine. This guarantees that if two pharmacists try to dispense the last remaining bottle of medication at the exact same millisecond, the database row is locked, preventing negative inventory balances.
 *   **The Master Ledger Routing:** Initially, unpaid charges were floating and loosely attached to patients. I refactored the database schema to use centralized charge tables. Now, every department routes their specific foreign keys directly to the ledger, generating perfectly isolated, itemized financial records that cannot be duplicated.
