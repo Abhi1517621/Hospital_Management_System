@@ -1,9 +1,10 @@
+# Hospital Management System
+
+###  **[Experience the Live Application Here](https://hospital-management-system-p427.onrender.com/)**
+
 # CareFlow Enterprise: Hospital Management System
 
-An enterprise-grade, role-based Hospital Management System (HMS) built with Django. 
-
-I built CareFlow because I wanted to move beyond basic CRUD applications and tackle the messy, real-world edge cases of enterprise software. This project does not just store data; it handles concurrent database transactions, enforces strict financial ledgers, manages timezone-aware scheduling, and strictly governs state transitions across four different user roles while providing a seamless UX for the hospital staff.
-
+CareFlow is a role-based Hospital Management System (HMS) built with Django. It tackles race conditions, enforces strict financial ledgers, handles timezone-aware scheduling, and governs complex state transitions across multiple user roles—all while delivering a seamless UX for the hospital staff
 ---
 
 ## Project Overview
@@ -14,9 +15,9 @@ At its core, CareFlow simulates a living hospital workflow. When a patient books
 
 ## Database Architecture & Entity-Relationship Diagram
 
-To handle the complex relationships between clinical actions and financial billing, the database is highly normalized. 
+The Entity-Relationship (ER) diagram below is rendered dynamically using Mermaid.js.
 
-Because manual documentation rots quickly in agile development, I treated the database architecture as code. The Entity-Relationship (ER) diagram below is rendered dynamically using Mermaid.js. Notice how the base User model extends into specific profiles, and how the Inventory, Clinical, and Ward modules all route their foreign keys directly into the centralized billing tables to enforce strict state management and billing accuracy.
+To handle the complex relationships between clinical actions and financial billing, the database is highly normalized. Notice how the base User model extends into specific profiles, and how the Inventory, Clinical, and Ward modules all route their foreign keys directly into centralized billing tables to enforce absolute billing accuracy.
 
 ```mermaid
 erDiagram
@@ -229,6 +230,13 @@ The system uses a custom User model segmented into distinct operational roles. I
 
 ---
 
+## What's Next(Future Improvements)
+
+*   **Smart Symptom Checker:** Right now, patients just pick a doctor from a simple dropdown list. In the future, I want to add a text box where patients can just type how they are feeling (like "my head hurts"). The system would then read that and automatically suggest the best doctor for them, showing a match percentage.
+
+*   **Live Updates for Staff:**: Currently, pharmacists and lab workers have to refresh their screens to see new orders. I want to add real-time updates so that as soon as a doctor prescribes medicine, it instantly pops up on the pharmacist's screen without them having to click refresh.
+
+*   **Faster Background Tasks:** Things like making PDF bills or sending confirmation emails take time. Instead of making the user wait while the system does this, I want to move these tasks to the background. This will make the app feel much faster and smoother for the patient.
 ## Tech Stack
 
 *   **Backend:** Python, Django, Django ORM
@@ -244,7 +252,7 @@ The system uses a custom User model segmented into distinct operational roles. I
 **1. Clone the repository:**
 ```bash
 git clone https://github.com/Abhi1517621/Hospital_Management_System
-cd careflow-hms
+cd Hospital_Management_System
 ```
 
 **2. Set up the virtual environment:**
